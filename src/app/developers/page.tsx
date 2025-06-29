@@ -8,7 +8,7 @@ export default function DevelopersPage() {
   const [isHovered, setIsHovered] = useState(false)
 
   const handleOpenLink = () => {
-    window.open('https://chaitu3d-babun8sot-chaithupros-projects.vercel.app/', '_blank')
+    window.open('https://chaitu3d.vercel.app/', '_blank')
   }
 
   return (
