@@ -16,6 +16,8 @@ export interface Article {
   comments: number
   created_at: string
   updated_at: string
+  isRead?: boolean
+  isSaved?: boolean
 }
 
 export interface CreateArticleData {
