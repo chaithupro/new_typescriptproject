@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import { useAuthStore } from '@/store/authStore'
+import { createArticle } from '@/lib/articles'
 import { Save, X } from 'lucide-react'
 
 export default function CreateArticlePage() {
@@ -12,6 +13,7 @@ export default function CreateArticlePage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,7 +25,11 @@ export default function CreateArticlePage() {
     'Mobile Development',
     'Design',
     'Business',
-    'Science'
+    'Science',
+    'Finance',
+    'Environment',
+    'Healthcare',
+    'Education'
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,15 +43,35 @@ export default function CreateArticlePage() {
       return
     }
 
+    if (!user) {
+      setError('You must be logged in to create an article')
+      setLoading(false)
+      return
+    }
+
     try {
-      // In a real app, you'd save to your database
-      console.log('Creating article:', { title, content, category, author: user?.email })
+      // Create summary from content (first 150 characters)
+      const summary = content.length > 150 
+        ? content.substring(0, 150) + '...'
+        : content
+
+      // Save article to Supabase
+      await createArticle({
+        title: title.trim(),
+        summary: summary,
+        content: content.trim(),
+        author: user.email || 'Anonymous',
+        source: 'User Generated',
+        category: category,
+        image_url: imageUrl.trim() || undefined,
+        sentiment: 'neutral', // Default sentiment
+        sentiment_explanation: 'User-generated content'
+      })
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      // Redirect to homepage
       router.push('/')
-    } catch {
+    } catch (err) {
+      console.error('Error creating article:', err)
       setError('Failed to create article. Please try again.')
     } finally {
       setLoading(false)
@@ -109,6 +135,74 @@ export default function CreateArticlePage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+                Image URL (Optional)
+              </label>
+              <input
+                type="url"
+                id="imageUrl"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="https://example.com/image.jpg"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Add an image URL to make your article more engaging. You can use services like Unsplash, Pexels, or any public image URL.
+              </p>
+              
+              {/* Image Preview */}
+              {imageUrl && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
+                  <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                        const errorDiv = target.nextElementSibling as HTMLDivElement;
+                        if (errorDiv) {
+                          errorDiv.style.display = 'flex';
+                        }
+                      }}
+                    />
+                    <div className="hidden absolute inset-0 items-center justify-center bg-gray-100 text-gray-500">
+                      <p className="text-sm">Invalid image URL</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Quick Image Suggestions */}
+              <div className="mt-3">
+                <p className="text-sm font-medium text-gray-700 mb-2">Quick Image Suggestions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop'
+                  ].map((url, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setImageUrl(url)}
+                      className="w-16 h-12 rounded border-2 border-gray-200 hover:border-blue-500 overflow-hidden"
+                    >
+                      <img
+                        src={url}
+                        alt={`Option ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div>

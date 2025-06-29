@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { User, AuthError } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 interface AuthState {
   user: User | null
@@ -17,7 +17,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: true,
 
   signIn: async (email: string, password: string) => {
-    const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -26,7 +25,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signUp: async (email: string, password: string) => {
-    const supabase = createClient()
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -35,7 +33,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signOut: async () => {
-    const supabase = createClient()
     await supabase.auth.signOut()
     set({ user: null })
   },
