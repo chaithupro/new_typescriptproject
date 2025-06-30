@@ -13,23 +13,40 @@ export default function CreateArticlePage() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('')
+  const [source, setSource] = useState('')
+  const [sentiment, setSentiment] = useState<'positive' | 'negative' | 'neutral'>('neutral')
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const categories = [
     'Technology',
-    'Programming',
-    'AI',
-    'Web Development',
-    'Mobile Development',
-    'Design',
-    'Business',
-    'Science',
     'Finance',
     'Environment',
     'Healthcare',
-    'Education'
+    'Science',
+    'Education',
+    'Politics',
+    'Sports',
+    'Entertainment',
+    'Business',
+  ]
+
+  const sources = [
+    'TechDaily',
+    'Finance Weekly',
+    'Green News',
+    'Health Today',
+    'Space News',
+    'EduTech',
+    'Global Times',
+    'Sports Central',
+  ]
+
+  const sentiments = [
+    { value: 'positive', label: 'Positive' },
+    { value: 'negative', label: 'Negative' },
+    { value: 'neutral', label: 'Neutral' },
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +54,7 @@ export default function CreateArticlePage() {
     setLoading(true)
     setError('')
 
-    if (!title.trim() || !content.trim() || !category) {
+    if (!title.trim() || !content.trim() || !category || !source || !sentiment) {
       setError('Please fill in all fields')
       setLoading(false)
       return
@@ -61,14 +78,12 @@ export default function CreateArticlePage() {
         summary: summary,
         content: content.trim(),
         author: user.email || 'Anonymous',
-        source: 'User Generated',
+        source: source,
         category: category,
         image_url: imageUrl.trim() || undefined,
-        sentiment: 'neutral', // Default sentiment
+        sentiment: sentiment,
         sentiment_explanation: 'User-generated content'
       })
-      
-      // Redirect to homepage
       router.push('/')
     } catch (err) {
       console.error('Error creating article:', err)
@@ -135,6 +150,48 @@ export default function CreateArticlePage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label htmlFor="source" className="block text-sm font-medium text-gray-700">
+                Source
+              </label>
+              <select
+                id="source"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                required
+              >
+                <option value="">Select a source</option>
+                {sources.map((src) => (
+                  <option key={src} value={src}>
+                    {src}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Sentiment
+              </label>
+              <div className="flex gap-6">
+                {sentiments.map((s) => (
+                  <label key={s.value} className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name="sentiment"
+                      value={s.value}
+                      checked={sentiment === s.value}
+                      onChange={() => setSentiment(s.value as 'positive' | 'negative' | 'neutral')}
+                      className="form-radio text-blue-600"
+                      required
+                    />
+                    <span className="ml-2 text-gray-700">{s.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div>

@@ -29,7 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Create Article', href: '/create-article', icon: Plus },
-    { name: 'Saved Articles', href: '/saved', icon: Bookmark },
+    // { name: 'Saved Articles', href: '/saved', icon: Bookmark }, // Temporarily removed
     { name: 'Preferences', href: '/preferences', icon: Settings },
     { name: 'Profile', href: '/profile', icon: User },
     { name: 'Developers', href: '/developers', icon: Code },
