@@ -3,7 +3,11 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
-export default async function ArticlePage({ params }: { params: { id: string } }) {
+type Props = {
+  params: { id: string }
+}
+
+export default async function ArticlePage({ params }: Props) {
   const { id } = params
   const { data: article, error } = await supabase
     .from('articles')
