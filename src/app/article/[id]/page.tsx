@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
-export default async function ArticlePage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default async function ArticlePage(props: any) {
+  const { id } = props.params
   const { data: article, error } = await supabase
     .from('articles')
     .select('*')
